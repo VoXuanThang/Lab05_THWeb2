@@ -1,4 +1,5 @@
-﻿using BigSchool.Models;
+﻿
+using BigSchool.Models;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
@@ -15,15 +16,16 @@ namespace BigSchool.Controllers
         public IHttpActionResult Attend(Course attendanceDto)
         {
             var userID = User.Identity.GetUserId();
-            BigSchoolContext ctx = new BigSchoolContext();
-            if(ctx.Attendances.Any(p => p.Attendee == userID && p.CourseId==attendanceDto.Id))
+            BigSchoolContext con = new BigSchoolContext();
+            if (con.Attendances.Any(p => p.Attendee == userID && p.CourseId == attendanceDto.Id))
             {
                 return BadRequest("The attendance already exists!");
             }
             var attendance = new Attendance() { CourseId = attendanceDto.Id, Attendee = User.Identity.GetUserId() };
-            ctx.Attendances.Add(attendance);
-            ctx.SaveChanges();
+            con.Attendances.Add(attendance);
+            con.SaveChanges();
             return Ok();
         }
+
     }
 }
