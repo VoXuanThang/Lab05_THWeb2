@@ -3,6 +3,7 @@
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<h1></h1>
 
 <div class="row">
     <ul class="course">
@@ -20,12 +21,35 @@
                 <div class="details">
                     <span class="lecture">
                         @course.Name
+                        @if (course.isLogin)
+                        {
+                            if (course.isShowFollow)
+                            {
+                                <button data-user-id="@course.LecturerId" class="btn btn-default btn-sm js-tongle-follow btn-default">Follow</button>
+                            }
+                            else
+                            {
+                                <button data-user-id="@course.LecturerId" class="btn btn-default btn-sm js-tongle-follow btn-success">Following</button>
+                            }
+
+                        }
                     </span>
                     <div>
                         <span class="category">
                             @course.Category.Name
+                            @if (course.isLogin)
+                            {
+                                if (course.isShowGoing)
+                                {
+                                    <button data-course-id="@course.Id" class="btn btn-default btn-sm js-tongle-attendance btn-default">Going?</button>
+                                }
+                                else
+                                {
+                                    <button data-course-id="@course.Id" class="btn btn-default btn-sm js-tongle-attendance btn-info">Cancel going</button>
+                                }
+
+                            }
                         </span>
-                        <button data-course-id="course.Id" class="btn btn-default btn-sm js-tongle-attendance">Going?</button>
                     </div>
 
                 </div>
@@ -38,15 +62,56 @@
                 $(".js-tongle-attendance").click(function (e) {
                     var button = $(e.target);
                     $.post("/api/attendances", { Id: button.attr("data-course-id") })
-                    .done(function () {
-                        alert("Register course successfully!")
-                        button
-                            .removeClass("btn-default")
-                            .addClass("btn-info")
-                            .text("Going");
+                        .done(function (result) {
+                            if (result == "cancel") {
+                                alert("Cancelled registering!")
+                                button
+                                    .removeClass("btn-info")
+                                    .addClass("btn-default")
+                                    .text("Going?");
+                            }
+                            else {
+                                alert("Register course successfully!")
+                                button
+                                    .removeClass("btn-default")
+                                    .addClass("btn-info")
+                                    .text("Cancel going");
+                            }
+                        
                     }).fail(function () {
                         alert("Something failed");
                     });
+                });
+
+                $(".js-tongle-follow").click(function (e) {
+                    var button = $(e.target);
+                    var followee = button.attr("data-user-id"); 
+                    $.post("/api/followings", { FolloweeId: button.attr("data-user-id") })
+                        .done(function (result) {
+                            if (result == "cancel") {
+                                $('.js-tongle-follow').each(function (i, obj) {
+                                    if ($(this).attr('data-user-id') == followee) {
+                                        $(this).removeClass("btn-success")
+                                            .addClass("btn-default")
+                                            .text("Follow");
+                                    }
+                                });
+                                alert("Unfollowed!")
+                            }
+                            else {
+                                $('.js-tongle-follow').each(function (i, obj) {
+                                    if ($(this).attr('data-user-id') == followee) {
+                                        $(this).removeClass("btn-default")
+                                            .addClass("btn-success")
+                                            .text("Following");
+                                    }
+                                });
+                                alert("Follow successfully")
+                            }
+                            
+                        }).fail(function () {
+                            alert("Something failed");
+                        });
                 });
             });
         </script>

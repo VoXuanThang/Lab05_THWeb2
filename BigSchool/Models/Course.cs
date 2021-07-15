@@ -17,9 +17,6 @@ namespace BigSchool.Models
 
         public int Id { get; set; }
 
-        public string Name;
-        public string LecturerName;
-
         [Required]
         [StringLength(128)]
         public string LecturerId { get; set; }
@@ -38,5 +35,11 @@ namespace BigSchool.Models
         public virtual Category Category { get; set; }
 
         public List<Category> ListCategory = new List<Category>();
+        public string LecturerName;
+        public string Name;
+
+        public bool isLogin = false;
+        public bool isShowGoing = false;
+        public bool isShowFollow = false;
     }
 }

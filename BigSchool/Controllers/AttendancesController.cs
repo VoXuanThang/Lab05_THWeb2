@@ -16,10 +16,13 @@ namespace BigSchool.Controllers
         public IHttpActionResult Attend(Course attendanceDto)
         {
             var userID = User.Identity.GetUserId();
-            BigSchoolContext con = new BigSchoolContext();
+            BigSchoolDB con = new BigSchoolDB();
             if (con.Attendances.Any(p => p.Attendee == userID && p.CourseId == attendanceDto.Id))
             {
-                return BadRequest("The attendance already exists!");
+                //return BadRequest("The attendance already exists!");
+                con.Attendances.Remove(con.Attendances.SingleOrDefault(p => p.Attendee == userID && p.CourseId == attendanceDto.Id));
+                con.SaveChanges();
+                return Ok("cancel");
             }
             var attendance = new Attendance() { CourseId = attendanceDto.Id, Attendee = User.Identity.GetUserId() };
             con.Attendances.Add(attendance);
